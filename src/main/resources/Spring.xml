@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--
+        数据源
+        导入spring-mybatis.xml配置文件
+    -->
+    <import resource="classpath:SpringMyBatis.xml"/>
+
+    <!--事务管理-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--<tx:annotation-driven transaction-manager="txManager"/>-->
+
+    <!--配置事务管理规则(事务的传播特性)-->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <!--
+                propagation="REQUIRED":方法必须在事务下执行
+                isolation="DEFAULT":事务隔离级别
+                rollback-for="java.lang.Exception":指定发生对应的异常回滚
+            -->
+            <tx:method name="*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--配置AOP，指定切点-->
+    <aop:config>
+        <!--指定切点 剔除find方法-->
+        <aop:pointcut id="tranPointcut_other" expression="execution(* com.itheima.travel.service.impl.*.*(..)) and !execution(* com.itheima.travel.service.impl.*.find*(..))"/>
+        <!--配置通知-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="tranPointcut_other"/>
+    </aop:config>
+</beans>

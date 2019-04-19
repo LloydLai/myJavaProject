@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.travel.mapper.IRouteMapper">
+
+    <sql id="routeSQL1">
+        select count(*)
+        from tab_route
+        where rflag = 1
+    </sql>
+    <sql id="routeSQL2">
+        select *
+        from tab_route
+        where rflag = 1
+    </sql>
+
+    <select id="findCountByCid" resultType="long">
+        <include refid="routeSQL1"/>
+        <if test="cid!=null or ''!=cid or 'null'!=cid">and cid = #{cid}</if>
+        <if test="''!=keyword or 'null'!=keyword or keyword!=null">and rname like "%"#{keyword}"%"</if>
+    </select>
+
+    <select id="findPageRoutes" resultType="list">
+        <include refid="routeSQL1"/>
+        <if test="cid!=null or ''!=cid or 'null'!=cid">and cid = #{cid}</if>
+        <if test="''!=keyword or 'null'!=keyword or keyword!=null">and rname like "%"#{keyword}"%"</if>
+        <if test="1 == 1">limit #{currentPage}, #{pageSize};</if>
+    </select>
+
+    <select id="findRouteCount" resultType="long">
+        <include refid="routeSQL1"/>
+        <if test="maxPrice!=null or ''!=maxPrice or 'null'!=maxPrice">and price &lt;= #{maxPrice}</if>
+        <if test="minPrice!=null or ''!=minPrice or 'null'!=minPrice">and and price > #{minPrice}</if>
+        <if test="''!=rname or 'null'!=rname or rname!=null">and rname like "%"#{rname}"%"</if>
+    </select>
+
+    <select id="findPageRouteByCount" resultType="list">
+        <include refid="routeSQL2"/>
+        <if test="maxPrice!= null or ''!=maxPrice or 'null'!=maxPrice">and price &lt;= #{maxPrice}</if>
+        <if test="minPrice!= null or ''!=minPrice or 'null'!=minPrice">and and price > #{minPrice}</if>
+        <if test="''!=rname or 'null'!=rname or rname!=null">and rname like "%"#{rname}"%"</if>
+        <if test="1 == 1">order by count desc limit #{currentPage}, #{pageSize};</if>
+    </select>
+</mapper>

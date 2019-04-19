@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>收藏排行榜</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/ranking-list.css">
+    <script src="js/getParameter.js"></script>
+    <script type="text/javascript" src="js/jquery-3.3.1.js"></script>
+    <script>
+        var currentPage = getParameter("currentPage");
+        var rname = getParameter("rname");
+        var maxPrice = getParameter("maxPrice");
+        var minPrice = getParameter("minPrice");
+
+        //向服务器发送异步请求，获取收藏排行榜
+        var params = "currentPage=" + currentPage + "&rname=" + rname + "&minPrice=" + minPrice + "&maxPrice=" + maxPrice;
+        $.post("route/favoriteRank", params, function (result) {
+            var pageBean = result.data;
+            currentPage = pageBean.currentPage;
+            var totalPage = pageBean.totalPage;
+            var list = pageBean.list;
+            var pageSize = pageBean.pageSize;
+
+            //如果是第一页,1-8
+            //如果是第二页,9-16
+            //如果是第三页,17-24
+            //遍历展示路线集合
+            $.each(list, function (index, element) {
+                var num = (currentPage - 1) * pageSize + (index + 1);
+                var cla = "num";
+                //判断num的大小
+                if (num === 1) {
+                    //颜色就是红色,class="num one"
+                    cla += " one";
+                } else if (num === 2) {
+                    //颜色，橘黄色,class="num two"
+                    cla += " two";
+                }
+
+                //每一个element其实就是一个route
+                $(".list ul").append("<li>\n" +
+                    "                        <span class=\"" + cla + "\">" + num + "</span>\n" +
+                    "                        <a href=\"route_detail.html\"><img src=\"" + element.rimage + "\" alt=\"\"></a>\n" +
+                    "                        <h4><a href=\"route_detail.html\">" + element.rname + "</a></h4>\n" +
+                    "                        <p>\n" +
+                    "                            <b class=\"price\">&yen;<span>" + element.price + "</span>起</b>\n" +
+                    "                            <span class=\"shouchang\">已收藏" + element.count + "次</span>\n" +
+                    "                        </p>\n" +
+                    "                    </li>")
+            });
+
+            //展示页码
+            //1.展示首页、上一页，当前页不是第一页的时候
+            if (currentPage !== 1) {
+                $(".pageNum ul").append("<li><a href=\"favoriterank.html?currentPage=1" + "&rname=" + rname + "&minPrice=" + minPrice + "&maxPrice=" + maxPrice + "\">首页</a></li>\n" +
+                    "                            <li class=\"threeword\"><a href=\"favoriterank.html?currentPage=" + (currentPage - 1) + "&rname=" + rname + "&minPrice=" + minPrice + "&maxPrice=" + maxPrice + "\">上一页</a></li>")
+            }
+
+            //2.展示所有页码
+            var begin = 1;
+            var end = 10;
+
+            //接下来，按照不同的条件，改变begin和end的值
+            //1.如果当前页>6,那么begin就要变成当前页-5
+            if (currentPage > 6) {
+                begin = currentPage - 5;
+
+                //end则变成
+                end = currentPage + 4;
+            }
+
+            //end一定不能大于总页数，end最大只能是总页数
+            if (end > totalPage) {
+                end = totalPage
+            }
+
+            for (var i = begin; i <= end; i++) {
+                //让当前页高亮，如果i等于currentPage则高亮
+                if (i === currentPage) {
+                    $(".pageNum ul").append("<li style='background-color: orange'><a href=\"javascript:;\">" + i + "</a></li>")
+                } else {
+                    $(".pageNum ul").append("<li><a href=\"favoriterank.html?currentPage=" + i + "&rname=" + rname + "&minPrice=" + minPrice + "&maxPrice=" + maxPrice + "\">" + i + "</a></li>")
+                }
+
+            }
+
+            //3.展示下一页、末页,如果当前页不是最后一页的时候
+            if (currentPage !== totalPage) {
+                $(".pageNum ul").append("<li class=\"threeword\"><a href=\"favoriterank.html?currentPage=" + (currentPage + 1) + "&rname=" + rname + "&minPrice=" + minPrice + "&maxPrice=" + maxPrice + "\">下一页</a></li>\n" +
+                    "                            <li class=\"threeword\"><a href=\"favoriterank.html?currentPage=" + (totalPage) + "&rname=" + rname + "&minPrice=" + minPrice + "&maxPrice=" + maxPrice + "\">末页</a></li>")
+            }
+
+
+            //设置数据的回显
+            //我们发现rname经过了URLEncoder编码，我们要数据回显，得进行解码
+            rname = decodeURI(rname);
+
+            if (rname === null || rname === "null" || rname === "") {
+                rname = ""
+            }
+
+            //数据回显
+            $("#rname").val(rname);
+            $("#minPrice").val(minPrice);
+            $("#maxPrice").val(maxPrice);
+        }, "json");
+
+        //声明一个搜索的方法
+        function search() {
+            var minPrice = $("#minPrice").val();
+            var maxPrice = $("#maxPrice").val();
+            var rname = $("#rname").val();
+            //跳转到favoriterank.html,并且携带搜索的条件
+            location.href = "favoriterank.html?currentPage=1&minPrice=" + minPrice + "&maxPrice=" + maxPrice + "&rname=" + rname;
+        }
+    </script>
+</head>
+<body>
+<!--引入头部-->
+<div id="header"></div>
+<div class="contant">
+    <div class="shaixuan">
+        <span>线路名称</span>
+        <input type="text" id="rname" name="rname">
+        <span>金额</span>
+        <input type="text" id="minPrice" name="">~<input id="maxPrice" type="text">
+        <button onclick="search()">搜索</button>
+    </div>
+    <div class="list clearfix">
+        <ul>
+
+        </ul>
+    </div>
+    <div class="pageNum">
+        <ul>
+
+        </ul>
+    </div>
+</div>
+
+<!--导入底部-->
+<div id="footer"></div>
+<!--导入布局js，共享header和footer-->
+<script type="text/javascript" src="js/include.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--包扫描，扫描controller的注解，别的不扫描-->
+    <context:component-scan base-package="com.itheima.travel"/>
+
+    <!-- 配置spring开启注解mvc的支持-->
+    <mvc:annotation-driven/>
+
+    <!-- 配置视图解析器 三合一连接成完整请求路径-->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!--前缀-->
+        <property name="prefix" value="/WEB-INF/pages/"/>
+        <!--后缀-->
+        <property name="suffix" value=".html"/>
+    </bean>
+
+    <!-- 设置静态资源不过滤 -->
+    <mvc:default-servlet-handler/>
+    <!--<mvc:resources location="/css/" mapping="/css/**" />
+    <mvc:resources location="/images/" mapping="/images/**" />
+    <mvc:resources location="/js/" mapping="/js/**" />-->
+
+    <!--引入Spring配置-->
+    <import resource="classpath:Spring.xml"/>
+</beans>
