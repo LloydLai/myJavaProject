@@ -54,6 +54,9 @@ public class RouteServiceImpl implements IRouteService {
         //规定每页显示条数
         Integer pageSize = Constant.ROUTE_PAGESIZE;
         pageBean.setPageSize(pageSize);
+        if (keyword != null && !"null".equals(keyword) && !"".equals(keyword)) {
+            keyword = "%" + keyword + "%";
+        }
         //总数据条数
         Long totalSize = routeDao.findCountByCid(cid, keyword);
         pageBean.setTotalSize(totalSize);
@@ -118,7 +121,9 @@ public class RouteServiceImpl implements IRouteService {
     public PageBean<Route> favoriteRank(Long currentPage, String rname, String maxPrice, String minPrice) throws Exception {
         PageBean<Route> pageBean = new PageBean<>();
         pageBean.setCurrentPage(currentPage);
-
+        if (rname != null && !"null".equals(rname) && !"".equals(rname)) {
+            rname = "%" + rname + "%";
+        }
         Integer pageSize = Constant.ROUTE_PAGESIZE;
         pageBean.setPageSize(pageSize);
         Long totalSize = routeDao.findRouteCount(rname, maxPrice, minPrice);

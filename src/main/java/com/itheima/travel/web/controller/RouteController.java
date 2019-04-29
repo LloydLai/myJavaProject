@@ -65,6 +65,7 @@ public class RouteController {
         ResultInfo info = new ResultInfo(true);
         info.setFlag(true);
         try {
+
             PageBean<Route> pageBean = service.findRoutePage(cid, currentPage, keyword);
             info.setData(pageBean);
         } catch (Exception e) {
@@ -105,6 +106,7 @@ public class RouteController {
                                    @RequestParam(value = "minPrice") String minPrice) {
         ResultInfo info = new ResultInfo(true);
         try {
+
             PageBean<Route> pageBean = service.favoriteRank(currentPage, rname, maxPrice, minPrice);
             info.setData(pageBean);
         } catch (Exception e) {

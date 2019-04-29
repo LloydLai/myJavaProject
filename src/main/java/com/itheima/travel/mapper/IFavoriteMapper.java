@@ -20,7 +20,7 @@ public interface IFavoriteMapper {
     Favorite findFavorite(@Param("rid") Integer rid, @Param("user") User user);
 
     @Insert("insert into tab_favorite values(#{route}, #{date}, #{user});")
-    void addFavorite(Integer rid, User user);
+    void addFavorite(@Param("rid") Integer rid, @Param("user") User user);
 
     @Update("update tab_route set count = count + 1 where rid = #{rid};")
     void updateRouteCount(Integer rid);
@@ -32,10 +32,10 @@ public interface IFavoriteMapper {
     Long findMyFavoriteCount(User user);
 
     @Select("select * from tab_favorite f, tab_route r where f.rid = r.rid and uid = #{user.uid} limit #{currentPage}, #{pageSize};")
-    List<Map<String, Object>> findMyFavorites(User user, Long currentPage, Integer pageSize);
+    List<Map<String, Object>> findMyFavorites(@Param("user") User user, @Param("currentPage") Long currentPage, @Param("pageSize") Integer pageSize);
 
     @Update("")
-    void removeFavorite(Integer rid, User user);
+    void removeFavorite(@Param("rid") Integer rid, @Param("user") User user);
 
     @Update("")
     void lessFavoriteRouteCount(Integer rid);

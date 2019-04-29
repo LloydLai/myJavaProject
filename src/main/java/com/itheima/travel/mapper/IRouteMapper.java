@@ -4,6 +4,7 @@ import com.itheima.travel.domain.Category;
 import com.itheima.travel.domain.Route;
 import com.itheima.travel.domain.RouteImg;
 import com.itheima.travel.domain.Seller;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -26,9 +27,9 @@ public interface IRouteMapper {
     @Select("select * from tab_route where rflag = 1 and isThemeTour = 1 limit 0, 4;")
     List<Route> findThemeList();
 
-    Long findCountByCid(Integer cid, String keyword);
+    Long findCountByCid(@Param("cid") Integer cid, @Param("keyword") String keyword);
 
-    List<Route> findPageRoutes(Long currentPage, Integer pageSize, Integer cid, String keyword);
+    List<Route> findPageRoutes(@Param("currentPage") Long currentPage, @Param("pageSize") Integer pageSize, @Param("cid") Integer cid, @Param("keyword") String keyword);
 
     @Select("select * from tab_route where rid = #{rid};")
     Route findCountByRid(Integer rid);
@@ -46,7 +47,7 @@ public interface IRouteMapper {
     @Select("select * from tab_route r, tab_category c, tab_seller s where r.cid = c.cid and r.sid = s.sid and rid = #{rid};")
     Map<String, Object> findRouteByRid(Integer rid);
 
-    Long findRouteCount(String rname, String maxPrice, String minPrice);
+    Long findRouteCount(@Param("rname") String rname, @Param("maxPrice") String maxPrice, @Param("minPrice") String minPrice);
 
-    List<Route> findPageRouteByCount(Long currentPage, Integer pageSize, String rname, String maxPrice, String minPrice);
+    List<Route> findPageRouteByCount(@Param("currentPage") Long currentPage, @Param("pageSize") Integer pageSize, @Param("rname") String rname, @Param("maxPrice") String maxPrice, @Param("minPrice") String minPrice);
 }

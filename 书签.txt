@@ -1,0 +1,107 @@
+备份：
+
+package com.itheima.travel.config;
+
+import org.springframework.context.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+/**
+ * @author LloydLai
+ * @version 1.0
+ * @Description: TODO
+ * @date Created in 2019/4/14 16:31
+ * @Modified By: TODO
+ */
+@Configuration
+@ComponentScan(basePackages = {"com.itheima.travel.service", "com.itheima.travel.mapper"},
+        excludeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = {Controller.class})})
+@EnableAspectJAutoProxy
+@EnableTransactionManagement
+@Import(JdbcConfig.class)
+public class SpringConfiguration {
+}
+
+
+
+package com.itheima.travel.config;
+
+
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import javax.sql.DataSource;
+
+/**
+ * @author LloydLai
+ * @version 1.0
+ * @Description: 连接数据库的配置类
+ * @date Created in 2019/4/9 14:47
+ * @Modified By: TODO
+ */
+@PropertySource("classpath:JdbcConfig.properties")
+@MapperScan(basePackages = {"com.itheima.travel.mapper"})
+public class JdbcConfig {
+    @Value("${jdbc.driver}")
+    private String driver;
+
+    @Value("${jdbc.url}")
+    private String url;
+
+    @Value("${jdbc.username}")
+    private String username;
+
+    @Value("${jdbc.password}")
+    private String password;
+
+    /**
+     * 创建一个数据源，存入spring容器中
+     * Bean --value 唯一标识符，就是与返回值类型对象对应
+     *
+     * @return
+     */
+    @Bean(name = "dataSource")
+    public DataSource createDataSource() {
+        try {
+            DriverManagerDataSource dataSource = new DriverManagerDataSource();
+            dataSource.setDriverClassName(driver);
+            dataSource.setUrl(url);
+            dataSource.setUsername(username);
+            dataSource.setPassword(password);
+            return dataSource;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    /**
+     * 创建sqlSessionFactoryBean
+     *
+     * @return
+     */
+    @Bean(name = "sqlSessionFactoryBean")
+    public SqlSessionFactoryBean createSqlSessionFactory(DataSource dataSource) {
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource);
+        return sqlSessionFactoryBean;
+    }
+
+    /**
+     * 事务管理
+     *
+     * @param dataSource
+     * @return
+     */
+    @Bean(name = "txManager")
+    public DataSourceTransactionManager createDataSourceTransactionManager(DataSource dataSource) {
+        DataSourceTransactionManager txManager = new DataSourceTransactionManager();
+        txManager.setDataSource(dataSource);
+        return txManager;
+    }
+}
